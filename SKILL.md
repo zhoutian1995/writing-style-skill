@@ -262,6 +262,70 @@ allowed-tools:
 
 ---
 
+## 【7.5】配图生成流程（公众号专用）
+
+**封面图和正文配图的生成流程，必须按以下步骤走。**
+
+### 工具选择
+- **背景图生成**：用 `cli-switch --tool gemini nanobanana` 切换到 nano banana2（gemini-3.1-flash-image-preview），然后用 Gemini CLI 或直接调 API 生成
+- **中文标题叠加**：用 PIL（Python）在背景图上叠加清晰中文标题
+- **⚠️ 禁止**：不要让 AI 直接生成带文字的图片（拼写错误率高）
+
+### 封面图规范
+- **尺寸**：900x383px（公众号封面比例 2.35:1）
+- **风格**：赛博朋克/科技风（深色背景 + 发光线条 + 电路板元素）
+- **底部**：加渐变遮罩（黑色半透明），让白色标题清晰可读
+- **标题**：主标题白色+发光描边，副标题青色
+- **⚠️ 铁律**：封面图必须放在文章**第一行**
+
+### 生成流程
+```bash
+# 1. 切换到 nano banana2
+cli-switch --tool gemini nanobanana
+
+# 2. 生成背景图（用API或CLI，不要含文字）
+curl -s "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key=$GEMINI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"contents":[{"parts":[{"text":"Generate an image: [prompt描述，末尾加 no text no words no letters]"}]}],"generationConfig":{"responseModalities":["TEXT","IMAGE"]}}'
+
+# 3. 用PIL叠加中文标题
+python3 -c "
+from PIL import Image, ImageDraw, ImageFont
+# 调整尺寸 → 加渐变遮罩 → 加标题文字 → 保存
+"
+
+# 4. 自审图片质量
+# 用 image 工具检查：清晰度、可读性、风格、整体质量
+```
+
+### 正文配图
+- 每 2-3 段插一张，打破视觉疲劳
+- 主题：概念图解（如 Harness 三根支柱）、数据对比图、场景插图
+- 同样用 nano banana2 生成背景 + PIL 叠加
+
+---
+
+## 【8】写后自审（AI 自我评价）
+
+**写完文章后，必须从 6 个维度给自己打分（1-10），并给出具体优化建议。不要锁死规则，要主动提意见。**
+
+| 维度 | 评价标准 |
+|------|---------|
+| **内容深度** | 核心概念解释清楚了吗？读者看完能复述吗？ |
+| **字数匹配** | 内容需要多少字才说得清楚？不要为了简洁牺牲深度，也不要注水 |
+| **情绪触发** | 读者在哪些位置会产生共鸣/意外/焦虑/启发？ |
+| **案例质量** | 案例够具体吗？是内部经历还是用户能共鸣的通用场景？ |
+| **金句密度** | 有没有让读者想转发的句子？够不够？ |
+| **互动钩子** | 结尾让人想回复吗？ |
+
+**自审规则：**
+- 字数是指导，不是死线。Harness 这种需要展开的概念，2500 字比 1500 字好
+- 如果自审发现某个维度低于 6 分，主动提出优化建议
+- 不要等用户问"你觉得写得怎么样"，写完就自审
+- 主动说问题在哪，不要只报喜
+
+---
+
 ## 🔄 自动学习（内置）
 
 **这个 skill 会从你的修改中自动学习。不需要手动写规则。**
