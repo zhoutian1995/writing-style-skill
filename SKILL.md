@@ -262,6 +262,54 @@ allowed-tools:
 
 ---
 
+## 【7.5】公众号发布全流程（从文章到草稿箱）
+
+**写完文章后，按以下流程推送到公众号草稿箱。不要跳步。**
+
+### 第一步：生成封面图
+- 用 `cli-switch --tool gemini nanobanana` 切到 nano banana2
+- 调 API 生成赛博朋克风背景图（prompt末尾加 no text no words no letters）
+- 用 PIL 叠加中文标题（主标题白色+发光描边，副标题青色）
+- 尺寸：900x383px，底部加渐变遮罩
+- **封面图必须第一行**
+
+### 第二步：生成正文插图（3-5张）
+- 风格：**简约扁平插画风**（不是赛博朋克！）
+- 浅色背景，柔和色调，简单几何图形
+- 每2-3段插一张，打破视觉疲劳
+- 主题：概念图解、对比图、场景插图
+- 生成后飞书发周老板审核
+
+### 第三步：推送到公众号草稿箱
+- 用 Python 脚本调用微信 API（`push_to_wechat.py` 流程）
+- 流程：获取access_token → 上传封面图 → 上传正文插图 → md转HTML → 创建草稿
+- **HTML排版规范**（参考已发布文章风格）：
+  - 字体：PingFang SC / Microsoft YaHei
+  - 行距：1.75
+  - 正文色：#3f3f3f，字号：15px
+  - 标题：加粗+字号区分（h2=22px，h3=18px）
+  - 分隔线：border-top 1px solid #eee
+- **⚠️ 不要用裸markdown转HTML**（没有CSS，排版粗糙）
+
+### 第四步：文章末尾必加内容
+- **往日推荐**：3篇已发布文章的链接
+  - PicoClaw：https://mp.weixin.qq.com/s/HWTA4Fs3kz31M0DShRMYtQ
+  - Tokens 自由：https://mp.weixin.qq.com/s/IyfjwBbNquLJB7UF2R4CVg
+  - CLI-Switch：https://mp.weixin.qq.com/s/EOIGUVJE8zyzvAO_psZHUA
+- **公众号二维码**：`02-内容工厂/公众号草稿/qrcode.jpg`
+- 格式：往日推荐链接（蓝色）+ 二维码图片（居中200px）+ "扫码关注"文字
+
+### 第五步：飞书云文档同步
+- 图片用本地路径飞书无法显示，需标注 `[插图X：文件名]`
+- 文章正文+配图位置标注写入飞书云文档
+
+### 文件目录
+- 文章：`02-内容工厂/公众号草稿/[文章名].md`
+- 配图：`02-内容工厂/公众号草稿/img1-5.png` + `harness-cover-v3.png`
+- 二维码：`02-内容工厂/公众号草稿/qrcode.jpg`
+
+---
+
 ## 【7.5】配图生成流程（公众号专用）
 
 **封面图和正文配图的生成流程，必须按以下步骤走。**
